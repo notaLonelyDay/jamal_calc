@@ -1,5 +1,5 @@
 sealed class Currency(
-    val amount: Double,
+    var amount: Double,
     val sign: String
 ) {
 
@@ -10,13 +10,27 @@ sealed class Currency(
     }
 
     class Rubles(amount: Double) : Currency(amount, sign = "p") {
+
         override fun toString(): String {
             return "$amount$sign"
         }
     }
 
+    fun add(currency: Currency): Currency {
+        if (this is Dollars && currency is Dollars) {
+            return Dollars(
+                amount+currency.amount,
+            )
+        }
+        if (this is Rubles && currency is Rubles) {
+            return Rubles(
+                amount+currency.amount,
+            )
+        }
+        throw RuntimeException("Can't add $this and $currency")
+    }
     companion object {
-        fun parseCurrency(s: String): Currency {
+        fun parseCurrency(s: String): Currency? {
             return when {
                 s.startsWith("$") -> {
                     Dollars(
@@ -30,9 +44,11 @@ sealed class Currency(
                     )
                 }
 
-                else -> throw RuntimeException("Parse error in $s")
+                else -> null
             }
         }
+
+        const val cCh = "123456789\$p."
     }
 }
 
